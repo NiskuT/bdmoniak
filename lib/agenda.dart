@@ -31,7 +31,7 @@ class AgendaPage extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
 
           return snapshot.hasData
-              ? calendrier(events: getCalendarDataSource())//EventDataSource(snapshot.data))
+              ? calendrier(events: EventDataSource(snapshot.data)) /*getCalendarDataSource())*/
               : Center(child: CircularProgressIndicator());
         },
       ),
@@ -85,81 +85,7 @@ class calendrier extends StatelessWidget {
     );
   }
 }
-/*
-void calendarTapped(CalendarLongPressDetails details, BuildContext context) {
-  if (details.targetElement == CalendarElement.appointment) {
-    final Event evenement = details.appointments[0];
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
 
-          return AlertDialog(
-            title: Container(child: new Text(evenement.eventName)),
-            content: Container(
-              width: 200,
-              height: 160,
-              child: Column(children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Text(
-                      'Le ${evenement.debut.day}/${evenement.debut.month}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Text(''),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Text(
-                        'De ${evenement.debut.hour}h${(evenement.debut.minute == 0) ? '' : evenement.debut.minute} '
-                        'à ${evenement.fin.hour}h${(evenement.fin.minute == 0) ? '' : evenement.fin.minute}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400, fontSize: 15)),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Text(
-                        'Rendez vous ${(evenement.lieu == null) ? 'où vous savez ;D' : evenement.lieu}!',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400, fontSize: 15)),
-                  ],
-                ),
-
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 180,
-                    child :Text(
-                        '${(evenement.description == null ? 'Ca sera génial!' : evenement.description)}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400, fontSize: 13),
-                        maxLines: 5,
-                        overflow: TextOverflow.ellipsis
-                    )),
-                  ],
-                ),
-              ]),
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text('Fermer'))
-            ],
-          );
-        });
-  }
-}
-*/
 
 SnackBar calendarTapped(
     CalendarLongPressDetails details, BuildContext context) {
@@ -179,7 +105,15 @@ SnackBar calendarTapped(
           ),
           Flexible(
             child: Text(
-              'Le ${evenement.debut.day}/${evenement.debut.month}',
+              (() {
+                if (evenement.debut.day == evenement.fin.day){
+                  return 'Le ${evenement.debut.day}/${evenement.debut.month}';
+                }
+                else {
+                  return 'Du ${evenement.debut.day}/${evenement.debut.month} '
+                      'au ${evenement.fin.day}/${evenement.fin.month}';
+                }})(),
+
               style: TextStyle(
                 fontWeight: FontWeight.w400,
                 fontSize: 20,
@@ -189,13 +123,44 @@ SnackBar calendarTapped(
           Text(''),
           Flexible(
             child: Text(
-                'De ${evenement.debut.hour}h${(evenement.debut.minute == 0) ? '' : evenement.debut.minute} '
-                'à ${evenement.fin.hour}h${(evenement.fin.minute == 0) ? '' : evenement.fin.minute}',
+              (() {
+                var debut = '';
+                var fin = '';
+                if (evenement.debut.minute == 0){
+                  debut = 'De ${evenement.debut.hour}h';
+                }
+                else if (evenement.debut.minute < 10){
+                  debut = 'De ${evenement.debut.hour}h0${evenement.debut.minute}';
+                }
+                else{
+                  debut = 'De ${evenement.debut.hour}h${evenement.debut.minute}';
+                }
+
+                if (evenement.fin.minute == 0){
+                  fin =  ' à ${evenement.fin.hour}h';
+                }
+                else if (evenement.fin.minute < 10) {
+                  fin = ' à ${evenement.fin.hour}h0${evenement.fin.minute}';
+                }
+                else {
+                  fin =  ' à ${evenement.fin.hour}h${evenement.fin.minute}';
+                }
+                return debut + fin;
+
+              } ()),
                 style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15)),
           ),
           Flexible(
             child: Text(
-                'Rendez vous ${(evenement.lieu == null) ? 'où vous savez ;D' : evenement.lieu}!',
+                (() {
+                  if (evenement.lieu == null){
+                    return ' ';
+                  }
+                  else{
+                    return 'Rendez vous ${evenement.lieu}!';
+                  }
+
+                }()),
                 style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15)),
           ),
           Flexible(
@@ -204,7 +169,9 @@ SnackBar calendarTapped(
                   style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13),
                   maxLines: 6,
                   overflow: TextOverflow.ellipsis)),
-        ]),
+        ],
+          mainAxisSize: MainAxisSize.min
+      ),
 
       duration: const Duration(seconds: 30),
       padding: EdgeInsets.all(10),
@@ -294,7 +261,7 @@ class EventDataSource extends CalendarDataSource {
     }
   }
 }
-
+/*
 EventDataSource getCalendarDataSource() {
   List<Event> appointments = <Event>[];
   appointments.add(Event(
@@ -312,20 +279,20 @@ EventDataSource getCalendarDataSource() {
     lieu: 'ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici '
   ));
   appointments.add(Event(
-    debut: DateTime(2021, 2, 15, 12, 0, 0),
-    fin: DateTime(2021, 2, 19, 12, 0, 0),
+    debut: DateTime(2021, 2, 23, 14,15, 0),
+    fin: DateTime(2021, 2, 23, 15, 8, 0),
     eventName: 'Release Meeting',
     couleur: "orange",
   ));
   appointments.add(Event(
-    debut: DateTime(2020, 12, 8, 14, 0, 0),
-    fin: DateTime(2020, 12, 8, 17, 0, 0),
+    debut: DateTime(2021, 2, 23, 16, 10, 0),
+    fin: DateTime(2021, 2, 23, 17, 5, 0),
     eventName: 'Performance check',
     couleur: "vert",
   ));
   appointments.add(Event(
-    debut: DateTime(2020, 12, 11, 5, 0, 0),
-    fin: DateTime(2020, 12, 11, 10, 0, 0),
+    debut: DateTime(2021, 2, 24, 12, 5, 0),
+    fin: DateTime(2021, 2, 24, 13, 0, 0),
     eventName: 'Support',
     couleur: "bleu",
   ));
@@ -338,3 +305,4 @@ EventDataSource getCalendarDataSource() {
 
   return EventDataSource(appointments);
 }
+*/

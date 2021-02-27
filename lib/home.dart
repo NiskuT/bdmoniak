@@ -125,8 +125,17 @@ class _NewsView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
-                              'Le ${news.date.day}/${news.date.month} à ${news.date.hour}h${(news.date.minute == 0) ? '' : news.date.minute} ',
+                            Text((() {
+                              if (news.date.minute == 0){
+                                return 'Le ${news.date.day}/${news.date.month} à ${news.date.hour}h ';
+                              }
+                              else if (news.date.minute < 10){
+                                return 'Le ${news.date.day}/${news.date.month} à ${news.date.hour}h0${news.date.minute} ';
+                              }
+                              else{
+                                return 'Le ${news.date.day}/${news.date.month} à ${news.date.hour}h${news.date.minute} ';
+                              }
+                            }()),
                               style: textTheme.caption,
                             ),
                             const SizedBox(height: 4),

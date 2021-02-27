@@ -24,3 +24,4 @@ https://gallery.flutter.dev/#/demo/snackbars
 -mettre des notifications
 -mettre un 0 devant les heure en dessous de 10 minutes (12h2 => 12h02)
 -checker les barres blanches sur la galerie photo
+-modification des dates et heures des evenements
