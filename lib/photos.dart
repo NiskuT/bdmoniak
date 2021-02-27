@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
+import 'package:photo_view/photo_view.dart';
 
 
 
@@ -86,8 +87,61 @@ class _GridPhotoItem extends StatelessWidget {
       ),
     );
 
-    return image;
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) {
+              return BigImage(
+                imageUrl:
+                photo,
+                tag: photo,
+              );
+            }));
+      },
+      child: Hero(
+        child: SizedBox(
+          height: 250,
+          child: Padding(
+              padding: const EdgeInsetsDirectional.only(end: 4),
+              child: Center(child: image)
+          ),
+        ),
+        tag: photo,
+      ),
+    );
 
+  }
+}
+
+
+class BigImage extends StatelessWidget {
+  final String imageUrl;
+  final String tag;
+
+  const BigImage({Key key, this.imageUrl, this.tag}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black87,
+      body: GestureDetector(
+        child: Center(
+          child: Hero(
+            tag: tag,
+            child: Container(
+                child: PhotoView(
+                  imageProvider: CachedNetworkImageProvider(imageUrl),
+                  minScale: PhotoViewComputedScale.contained ,
+                  maxScale: PhotoViewComputedScale.covered * 5,
+                )
+            ),
+          ),
+        ),
+        onTap: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 }
 

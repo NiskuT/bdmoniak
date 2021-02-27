@@ -31,7 +31,7 @@ class AgendaPage extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
 
           return snapshot.hasData
-              ? calendrier(events: EventDataSource(snapshot.data))
+              ? calendrier(events: getCalendarDataSource())//EventDataSource(snapshot.data))
               : Center(child: CircularProgressIndicator());
         },
       ),
@@ -79,13 +79,13 @@ class calendrier extends StatelessWidget {
         ),
         todayHighlightColor: Colors.pink[600],
         onLongPress: (CalendarLongPressDetails details) {
-          return calendarTapped(details, context);
+          calendarTapped(details, context);
         },
       ),
     );
   }
 }
-
+/*
 void calendarTapped(CalendarLongPressDetails details, BuildContext context) {
   if (details.targetElement == CalendarElement.appointment) {
     final Event evenement = details.appointments[0];
@@ -157,6 +157,63 @@ void calendarTapped(CalendarLongPressDetails details, BuildContext context) {
             ],
           );
         });
+  }
+}
+*/
+
+SnackBar calendarTapped(
+    CalendarLongPressDetails details, BuildContext context) {
+  if (details.targetElement == CalendarElement.appointment) {
+    final Event evenement = details.appointments[0];
+
+    final snackBar = SnackBar(
+      content: Column(children: <Widget>[
+          Flexible(
+            child: Text(
+              evenement.eventName,
+              style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: 22,
+              ),
+            ),
+          ),
+          Flexible(
+            child: Text(
+              'Le ${evenement.debut.day}/${evenement.debut.month}',
+              style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: 20,
+              ),
+            ),
+          ),
+          Text(''),
+          Flexible(
+            child: Text(
+                'De ${evenement.debut.hour}h${(evenement.debut.minute == 0) ? '' : evenement.debut.minute} '
+                'à ${evenement.fin.hour}h${(evenement.fin.minute == 0) ? '' : evenement.fin.minute}',
+                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15)),
+          ),
+          Flexible(
+            child: Text(
+                'Rendez vous ${(evenement.lieu == null) ? 'où vous savez ;D' : evenement.lieu}!',
+                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15)),
+          ),
+          Flexible(
+              child: Text(
+                  '${(evenement.description == null ? 'Ca sera génial!' : evenement.description)}',
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13),
+                  maxLines: 6,
+                  overflow: TextOverflow.ellipsis)),
+        ]),
+
+      duration: const Duration(seconds: 30),
+      padding: EdgeInsets.all(10),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      behavior: SnackBarBehavior.floating,
+    );
+    Scaffold.of(context).hideCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 }
 
@@ -237,22 +294,26 @@ class EventDataSource extends CalendarDataSource {
     }
   }
 }
-/*
+
 EventDataSource getCalendarDataSource() {
   List<Event> appointments = <Event>[];
   appointments.add(Event(
-    debut: DateTime(2020, 12, 4, 12, 0, 0),
-    fin: DateTime(2020, 12, 4, 13, 0, 0),
-    eventName: 'Meeting',
+    debut: DateTime(2021, 2, 23, 12, 0, 0),
+    fin: DateTime(2021, 2, 23, 13, 0, 0),
+    eventName: 'Meeting Meeting Meeting Meeting Meeting Meeting Meeting Meeting Meeting Meeting Meeting Meeting',
     couleur: "rouge",
     description: 'blablabla blablabla blablabla blablabla blablabla '
         'blablabla blablabla blablabla blablabla blablabla blablabla '
         'blablabla blablabla blablabla blablabla blablabla blablabla '
+        'blablabla blablabla blablabla blablabla blablabla blablabla '
+        'blablabla blablabla blablabla blablabla blablabla blablabla '
+        'blablabla blablabla blablabla blablabla blablabla blablabla '
         'blablabla blablabla blablabla blablabla blablabla blablabla ',
+    lieu: 'ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici ici '
   ));
   appointments.add(Event(
-    debut: DateTime(2020, 12, 8, 12, 0, 0),
-    fin: DateTime(2020, 12, 9, 12, 0, 0),
+    debut: DateTime(2021, 2, 15, 12, 0, 0),
+    fin: DateTime(2021, 2, 19, 12, 0, 0),
     eventName: 'Release Meeting',
     couleur: "orange",
   ));
@@ -277,4 +338,3 @@ EventDataSource getCalendarDataSource() {
 
   return EventDataSource(appointments);
 }
-*/

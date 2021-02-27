@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:photo_view/photo_view.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -104,15 +106,6 @@ class _NewsView extends StatelessWidget {
     final textTheme = _buildLightTextTheme(Theme.of(context).textTheme);
 
     return InkWell(
-      onTap: () {
-        /*
-        Provider.of<EmailStore>(
-          context,
-          listen: false,
-        ).currentlySelectedEmailId = id;
-        onTap();
-      */
-      },
       child: Builder(
         builder: (context) {
           return ConstrainedBox(
@@ -182,15 +175,68 @@ class PicturePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 250,
-      child: Padding(
-        padding: const EdgeInsetsDirectional.only(end: 4),
-        child: Center(child: Image.network(url)),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) {
+              return FullScreenImage(
+                imageUrl:
+                url,
+                tag: url,
+              );
+            }));
+      },
+      child: Hero(
+        child: SizedBox(
+          height: 250,
+          child: Padding(
+            padding: const EdgeInsetsDirectional.only(end: 4),
+            child: Center(child: CachedNetworkImage(
+              imageUrl: url,
+            ))
+          ),
+        ),
+        tag: url,
+      ),
+    );
+
+
+
+  }
+}
+
+
+class FullScreenImage extends StatelessWidget {
+  final String imageUrl;
+  final String tag;
+
+  const FullScreenImage({Key key, this.imageUrl, this.tag}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black87,
+      body: GestureDetector(
+        child: Center(
+          child: Hero(
+            tag: tag,
+            child: Container(
+                child: PhotoView(
+                  imageProvider: CachedNetworkImageProvider(imageUrl),
+                  minScale: PhotoViewComputedScale.contained ,
+                  maxScale: PhotoViewComputedScale.covered * 5,
+                )
+            ),
+          ),
+        ),
+        onTap: () {
+          Navigator.pop(context);
+        },
       ),
     );
   }
 }
+
 
 double letterSpacingOrNone(double letterSpacing) =>
     kIsWeb ? 0.0 : letterSpacing;
