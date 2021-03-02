@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_view/photo_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -35,12 +36,24 @@ List<News> parseNews(String responseBody) {
   return parsed.map<News>((json) => News.fromJson(json)).toList();
 }
 
+_lastNews(int id) async {
+  final prefs = await SharedPreferences.getInstance();
+  //print('Last news: $id .');
+  await prefs.setInt('lastNewsId', id);
+}
+
+
 Future<List<News>> fetchNews(http.Client client) async {
   final response =
       await client.get('http://bdmoniak.fr/application/produits/lire_news.php');
+  var mesNews = await compute(parseNews, response.body);
 
-  return compute(parseNews, response.body);
+  _lastNews(mesNews[0].id);
+  client.close();
+  return mesNews;
 }
+
+
 
 class HomePage extends StatelessWidget {
   HomePage({Key key}) : super(key: key);
@@ -208,8 +221,6 @@ class PicturePreview extends StatelessWidget {
         tag: url,
       ),
     );
-
-
 
   }
 }

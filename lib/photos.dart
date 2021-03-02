@@ -81,6 +81,7 @@ class _GridPhotoItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final Widget image = Material(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      color: Color(0xFFD2DBE0),
       clipBehavior: Clip.antiAlias,
       child: CachedNetworkImage(
         imageUrl: photo,
